@@ -25,7 +25,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
 
 ## Tasks
 
-- [ ] 1. Scaffold project structure and configuration
+- [x] 1. Scaffold project structure and configuration
   - Create the `flowly/` package layout from Design §4: `app/` with `api/`, `schemas/`, `services/`, `planning/`, `data/`, `domain/` subpackages (each with `__init__.py`), plus `frontend/` and `tests/unit/` and `tests/api/` directories.
 - Add a dependency manifest (`requirements.txt` or `pyproject.toml`) declaring the required dependencies: FastAPI, Pydantic, SQLAlchemy, uvicorn, pytest, and hypothesis.
   - Implement `app/config.py` with a settings object exposing `DATABASE_URL` (default SQLite file URL), so the engine is selected by configuration rather than code.
