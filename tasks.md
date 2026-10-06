@@ -32,8 +32,8 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
   - Add a `pytest` configuration (e.g., `pytest.ini` or `pyproject` section) that discovers `tests/unit` and `tests/api`.
   - _Requirements: §9, §10; Design §2, §4, §6_
 
-- [ ] 2. Define shared domain enums
-  - [ ] 2.1 Implement `app/domain/enums.py`
+- [x] 2. Define shared domain enums
+  - [x] 2.1 Implement `app/domain/enums.py`
     - Define `Priority` (`High`, `Medium`, `Low`), `Category` (`Academic`, `Work`, `Personal`, `Career`), `Completion` (`Incomplete`, `Complete`), and `Source` (`manual`) as string-valued enums.
     - _Requirements: §2.5, §2.6, §1.4, §10; Design §5_
 
