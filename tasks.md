@@ -25,15 +25,15 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
 
 ## Tasks
 
-- [ ] 1. Scaffold project structure and configuration
+- [x] 1. Scaffold project structure and configuration
   - Create the `flowly/` package layout from Design §4: `app/` with `api/`, `schemas/`, `services/`, `planning/`, `data/`, `domain/` subpackages (each with `__init__.py`), plus `frontend/` and `tests/unit/` and `tests/api/` directories.
 - Add a dependency manifest (`requirements.txt` or `pyproject.toml`) declaring the required dependencies: FastAPI, Pydantic, SQLAlchemy, uvicorn, pytest, and hypothesis.
   - Implement `app/config.py` with a settings object exposing `DATABASE_URL` (default SQLite file URL), so the engine is selected by configuration rather than code.
   - Add a `pytest` configuration (e.g., `pytest.ini` or `pyproject` section) that discovers `tests/unit` and `tests/api`.
   - _Requirements: §9, §10; Design §2, §4, §6_
 
-- [ ] 2. Define shared domain enums
-  - [ ] 2.1 Implement `app/domain/enums.py`
+- [x] 2. Define shared domain enums
+  - [x] 2.1 Implement `app/domain/enums.py`
     - Define `Priority` (`High`, `Medium`, `Low`), `Category` (`Academic`, `Work`, `Personal`, `Career`), `Completion` (`Incomplete`, `Complete`), and `Source` (`manual`) as string-valued enums.
     - _Requirements: §2.5, §2.6, §1.4, §10; Design §5_
 
