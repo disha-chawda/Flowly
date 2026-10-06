@@ -1,0 +1,6 @@
+FastAPI
+Pydantic
+SQLAlchemy
+uvicorn
+pytest
+hypothesis
