@@ -38,7 +38,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - _Requirements: §2.5, §2.6, §1.4, §10; Design §5_
 
 - [ ] 3. Set up database and ORM models
-  - [ ] 3.1 Implement `app/data/database.py`
+  - [x] 3.1 Implement `app/data/database.py`
     - Build the SQLAlchemy engine and session factory from `DATABASE_URL` in config, declare the ORM base, and provide a session-provider dependency plus a `create_all` helper for table creation.
     - _Requirements: §9, §10; Design §3, §4_
 
