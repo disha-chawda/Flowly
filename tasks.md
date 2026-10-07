@@ -37,12 +37,12 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Define `Priority` (`High`, `Medium`, `Low`), `Category` (`Academic`, `Work`, `Personal`, `Career`), `Completion` (`Incomplete`, `Complete`), and `Source` (`manual`) as string-valued enums.
     - _Requirements: §2.5, §2.6, §1.4, §10; Design §5_
 
-- [ ] 3. Set up database and ORM models
+- [x] 3. Set up database and ORM models
   - [x] 3.1 Implement `app/data/database.py`
     - Build the SQLAlchemy engine and session factory from `DATABASE_URL` in config, declare the ORM base, and provide a session-provider dependency plus a `create_all` helper for table creation.
     - _Requirements: §9, §10; Design §3, §4_
 
-  - [ ] 3.2 Implement `app/data/models.py` ORM models
+  - [x] 3.2 Implement `app/data/models.py` ORM models
     - Define the `Task` model with `id`, `title`, `description` (default `""`), `deadline` (nullable), `estimated_time` (nullable minutes), `priority` (default `Medium`), `category` (default `Personal`), `completion` (default `Incomplete`), `created_at` (server now), and `source` (default `manual`).
     - Define the `Commitment` model with `id`, `title`, `start_time`, `end_time`, `source` (default `manual`), and `created_at`.
     - _Requirements: §2.1–§2.6, §3.1, §9, §10; Design §5_
