@@ -56,16 +56,16 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Provide create, get-by-id, list, update, and delete methods against the `Commitment` model, each in a single transaction.
     - _Requirements: §3.1–§3.3, §9; Design §4, §7_
 
-- [ ] 5. Define Pydantic schemas with boundary validation
-  - [ ] 5.1 Implement `app/schemas/task.py`
+- [x] 5. Define Pydantic schemas with boundary validation
+  - [x] 5.1 Implement `app/schemas/task.py`
     - Define `TaskCreate`, `TaskUpdate`, and `TaskRead`. Enforce `title` length 1–200 after trimming (reject empty/whitespace-only), `estimated_time` a positive integer when present, and `priority`/`category` restricted to their enums. Apply defaults (`description=""`, `priority=Medium`, `category=Personal`, `completion=Incomplete`, `source=manual`).
     - _Requirements: §2.1–§2.6, §1.1, §10, §11; Design §5, §6, Error Handling_
 
-  - [ ] 5.2 Implement `app/schemas/commitment.py`
+  - [x] 5.2 Implement `app/schemas/commitment.py`
     - Define `CommitmentCreate`, `CommitmentUpdate`, and `CommitmentRead`. Enforce `title` length 1–200 after trimming and `end_time` strictly after `start_time`; default `source=manual`.
     - _Requirements: §3.1, §3.4, §10, §11; Design §5, §6, Error Handling_
 
-  - [ ] 5.3 Implement `app/schemas/dashboard.py`
+  - [x] 5.3 Implement `app/schemas/dashboard.py`
     - Define `WorkloadSummary`, `DailyPlan` (with per-task `fits` flag), `TodayView`, and `UpcomingView` response models matching the shapes in Design §6.
     - _Requirements: §4, §5, §6, §7, §8; Design §6, §8, §9_
 
