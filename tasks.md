@@ -47,12 +47,12 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Define the `Commitment` model with `id`, `title`, `start_time`, `end_time`, `source` (default `manual`), and `created_at`.
     - _Requirements: §2.1–§2.6, §3.1, §9, §10; Design §5_
 
-- [ ] 4. Implement data-access repositories
+- [x] 4. Implement data-access repositories
   - [x] 4.1 Implement `app/data/task_repository.py`
     - Provide create, get-by-id, list, update, delete, and set-completion methods against the `Task` model, each operating within a single transaction (full commit or rollback — no partial writes).
     - _Requirements: §1.1–§1.4, §9, §10; Design §4, §7, Error Handling_
 
-  - [ ] 4.2 Implement `app/data/commitment_repository.py`
+  - [x] 4.2 Implement `app/data/commitment_repository.py`
     - Provide create, get-by-id, list, update, and delete methods against the `Commitment` model, each in a single transaction.
     - _Requirements: §3.1–§3.3, §9; Design §4, §7_
 
