@@ -14,7 +14,7 @@ class Task(Base):
     # This column uniquely identifies each row
     id: Mapped[int] = mapped_column(primary_key = True)
     description: Mapped[str] = mapped_column(default = "")
-    deadline: Mapped[datetime| None] 
+    deadline: Mapped[datetime| None] = mapped_column(nullable = True)
     priority: Mapped[Priority] = mapped_column(default = Priority.MEDIUM)
     category: Mapped[Category] = mapped_column(default = Category.PERSONAL)
     completion: Mapped[Completion] = mapped_column(default = Completion.INCOMPLETE)
