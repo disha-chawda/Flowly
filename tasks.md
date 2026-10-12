@@ -70,8 +70,8 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - _Requirements: §4, §5, §6, §7, §8; Design §6, §8, §9_
 
 - [x] 6. Implement the pure interval-union planning function
- - [x] 6.1 Implement `app/planning/intervals.py`
-  - Write a pure `merge_intervals` function: sort intervals by start, walk left to right, extend when the next interval starts at or before the current end, otherwise close and open a new one. Return the merged intervals. No DB, clock, or I/O.
+  - [x] 6.1 Implement `app/planning/intervals.py`
+    - Write a pure `merge_intervals` function: sort intervals by start, walk left to right, extend when the next interval starts at or before the current end, otherwise close and open a new one. Return the merged intervals. No DB, clock, or I/O.
   - [x] 6.2 Write property test for interval union
     - **Property 9: Committed time is the union of intervals (no double-counting)**
     - **Validates: Requirements §3.4**
@@ -80,7 +80,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Empty set, single interval, back-to-back (adjacent) intervals, fully nested intervals, and identical intervals.
     - _Requirements: §3.4; Design Testing Strategy (unit tests)_
 
-- [] 7. Implement the pure workload-calculation function
+- [x] 7. Implement the pure workload-calculation function
   - [x] 7.1 Implement `app/planning/workload.py`
     - Pure function over target `date`, incomplete tasks due that date, and commitments. Fixed 960-minute window; committed = union length (reuse `intervals.py`); `available = max(0, 960 - committed)`; estimated = sum of `estimated_time` (missing counts as 0); `difference = available - estimated` (not clamped); `overloaded = estimated > available`. Return the `WorkloadSummary` fields.
     - _Requirements: §2.4, §3.4, §7; Design §8_
@@ -90,22 +90,22 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
   - Test cases should include commitments that overlap, extend beyond the planning window, and meet or exceed the full window.
   - *Requirements: §7; Design §8*
 
-  - [ ]* 7.3 Write property test for the available-time clamp
+  - [x]* 7.3 Write property test for the available-time clamp
     - **Property 10: Available time is clamped and never negative**
     - **Validates: Requirements §7**
     - `hypothesis`, min 100 iterations; assert `available = max(0, 960 - committed)` and `available >= 0` even when commitments meet or exceed the window. Tag: `Feature: flowly-mvp, Property 10: Available time is clamped and never negative`.
 
-  - [ ]* 7.4 Write property test for the estimated-sum rule
+  - [x]* 7.4 Write property test for the estimated-sum rule
     - **Property 11: Estimated minutes sum treats missing estimates as zero**
     - **Validates: Requirements §2.4, §7**
     - `hypothesis`, min 100 iterations; mix tasks with and without `estimated_time`; assert estimated equals the sum counting missing as 0. Tag: `Feature: flowly-mvp, Property 11: Estimated minutes sum treats missing estimates as zero`.
 
-  - [ ]* 7.5 Write property test for the overload flag
+  - [x]* 7.5 Write property test for the overload flag
     - **Property 12: Overload flag matches strict comparison**
     - **Validates: Requirements §7**
     - `hypothesis`, min 100 iterations; assert `overloaded` is true iff estimated strictly exceeds available. Tag: `Feature: flowly-mvp, Property 12: Overload flag matches strict comparison`.
 
-  - [ ]* 7.6 Write unit tests for workload boundaries
+  - [x]* 7.6 Write unit tests for workload boundaries
     - Commitment exactly equal to the full window (available = 0), estimated exactly equal to available (not overloaded), and empty inputs.
     - _Requirements: §7; Design Testing Strategy (unit tests)_
 
