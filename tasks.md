@@ -72,7 +72,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
 - [x] 6. Implement the pure interval-union planning function
  - [x] 6.1 Implement `app/planning/intervals.py`
   - Write a pure `merge_intervals` function: sort intervals by start, walk left to right, extend when the next interval starts at or before the current end, otherwise close and open a new one. Return the merged intervals. No DB, clock, or I/O.
-  -  [x] 6.2 Write property test for interval union
+  - [x] 6.2 Write property test for interval union
     - **Property 9: Committed time is the union of intervals (no double-counting)**
     - **Validates: Requirements §3.4**
     - Use `hypothesis` (min 100 iterations). Generate overlapping, nested, and adjacent intervals; assert union length never exceeds the sum of individual lengths. Tag: `Feature: flowly-mvp, Property 9: Committed time is the union of intervals (no double-counting)`.
@@ -80,12 +80,12 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Empty set, single interval, back-to-back (adjacent) intervals, fully nested intervals, and identical intervals.
     - _Requirements: §3.4; Design Testing Strategy (unit tests)_
 
-- [ ] 7. Implement the pure workload-calculation function
-  - [ ] 7.1 Implement `app/planning/workload.py`
+- [] 7. Implement the pure workload-calculation function
+  - [x] 7.1 Implement `app/planning/workload.py`
     - Pure function over target `date`, incomplete tasks due that date, and commitments. Fixed 960-minute window; committed = union length (reuse `intervals.py`); `available = max(0, 960 - committed)`; estimated = sum of `estimated_time` (missing counts as 0); `difference = available - estimated` (not clamped); `overloaded = estimated > available`. Return the `WorkloadSummary` fields.
     - _Requirements: §2.4, §3.4, §7; Design §8_
 
-  - [ ] 7.2 Write a unit test for committed time within the planning window
+  - [x] 7.2 Write a unit test for committed time within the planning window
   - Verify that the workload calculation never counts more than the 960-minute planning window as committed time.
   - Test cases should include commitments that overlap, extend beyond the planning window, and meet or exceed the full window.
   - *Requirements: §7; Design §8*
