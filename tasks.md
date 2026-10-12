@@ -69,16 +69,14 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Define `WorkloadSummary`, `DailyPlan` (with per-task `fits` flag), `TodayView`, and `UpcomingView` response models matching the shapes in Design §6.
     - _Requirements: §4, §5, §6, §7, §8; Design §6, §8, §9_
 
-- [ ] 6. Implement the pure interval-union planning function
- - [ ] 6.1 Implement `app/planning/intervals.py`
+- [x] 6. Implement the pure interval-union planning function
+ - [x] 6.1 Implement `app/planning/intervals.py`
   - Write a pure `merge_intervals` function: sort intervals by start, walk left to right, extend when the next interval starts at or before the current end, otherwise close and open a new one. Return the merged intervals. No DB, clock, or I/O.
-
-  - [ ]* 6.2 Write property test for interval union
+  -  [x] 6.2 Write property test for interval union
     - **Property 9: Committed time is the union of intervals (no double-counting)**
     - **Validates: Requirements §3.4**
     - Use `hypothesis` (min 100 iterations). Generate overlapping, nested, and adjacent intervals; assert union length never exceeds the sum of individual lengths. Tag: `Feature: flowly-mvp, Property 9: Committed time is the union of intervals (no double-counting)`.
-
-  - [ ]* 6.3 Write unit tests for interval union edge cases
+ - [x] 6.3 Write unit tests for interval union edge cases
     - Empty set, single interval, back-to-back (adjacent) intervals, fully nested intervals, and identical intervals.
     - _Requirements: §3.4; Design Testing Strategy (unit tests)_
 
