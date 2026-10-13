@@ -76,7 +76,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - **Property 9: Committed time is the union of intervals (no double-counting)**
     - **Validates: Requirements §3.4**
     - Use `hypothesis` (min 100 iterations). Generate overlapping, nested, and adjacent intervals; assert union length never exceeds the sum of individual lengths. Tag: `Feature: flowly-mvp, Property 9: Committed time is the union of intervals (no double-counting)`.
- - [x] 6.3 Write unit tests for interval union edge cases
+  - [x] 6.3 Write unit tests for interval union edge cases
     - Empty set, single interval, back-to-back (adjacent) intervals, fully nested intervals, and identical intervals.
     - _Requirements: §3.4; Design Testing Strategy (unit tests)_
 
@@ -90,51 +90,51 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
   - Test cases should include commitments that overlap, extend beyond the planning window, and meet or exceed the full window.
   - *Requirements: §7; Design §8*
 
-  - [x]* 7.3 Write property test for the available-time clamp
+  - [x] 7.3 Write property test for the available-time clamp
     - **Property 10: Available time is clamped and never negative**
     - **Validates: Requirements §7**
     - `hypothesis`, min 100 iterations; assert `available = max(0, 960 - committed)` and `available >= 0` even when commitments meet or exceed the window. Tag: `Feature: flowly-mvp, Property 10: Available time is clamped and never negative`.
 
-  - [x]* 7.4 Write property test for the estimated-sum rule
+  - [x] 7.4 Write property test for the estimated-sum rule
     - **Property 11: Estimated minutes sum treats missing estimates as zero**
     - **Validates: Requirements §2.4, §7**
     - `hypothesis`, min 100 iterations; mix tasks with and without `estimated_time`; assert estimated equals the sum counting missing as 0. Tag: `Feature: flowly-mvp, Property 11: Estimated minutes sum treats missing estimates as zero`.
 
-  - [x]* 7.5 Write property test for the overload flag
+  - [x] 7.5 Write property test for the overload flag
     - **Property 12: Overload flag matches strict comparison**
     - **Validates: Requirements §7**
     - `hypothesis`, min 100 iterations; assert `overloaded` is true iff estimated strictly exceeds available. Tag: `Feature: flowly-mvp, Property 12: Overload flag matches strict comparison`.
 
-  - [x]* 7.6 Write unit tests for workload boundaries
+  - [x] 7.6 Write unit tests for workload boundaries
     - Commitment exactly equal to the full window (available = 0), estimated exactly equal to available (not overloaded), and empty inputs.
     - _Requirements: §7; Design Testing Strategy (unit tests)_
 
-- [ ] 8. Implement the pure daily-plan function
-  - [ ] 8.1 Implement `app/planning/daily_plan.py`
+- [x] 8. Implement the pure daily-plan function
+  - [x] 8.1 Implement `app/planning/daily_plan.py`
     - Pure, deterministic function over target `date`, incomplete tasks, and available minutes. Candidate selection: include only incomplete tasks with a defined deadline on or before the date (no-deadline tasks excluded). Ordering: deadline ascending, then priority High>Medium>Low, then `created_at` ascending. Fitting: walk the ordered list accumulating `estimated_time` (missing = 0) and annotate each task's `fits` flag without changing the order. Return the `DailyPlan` shape.
     - _Requirements: §8; Design §9_
 
-  - [ ]* 8.2 Write property test for candidate selection
+  - [x] 8.2 Write property test for candidate selection
     - **Property 13: Daily-plan candidate selection**
     - **Validates: Requirements §8**
     - `hypothesis`, min 100 iterations; assert the plan includes exactly the incomplete tasks with a deadline on or before the date and never includes no-deadline tasks. Tag: `Feature: flowly-mvp, Property 13: Daily-plan candidate selection`.
 
-  - [ ]* 8.3 Write property test for deterministic ordering
+  - [x] 8.3 Write property test for deterministic ordering
     - **Property 14: Daily-plan deterministic ordering**
     - **Validates: Requirements §8**
     - `hypothesis`, min 100 iterations; assert every adjacent pair respects deadline, then priority, then `created_at`. Tag: `Feature: flowly-mvp, Property 14: Daily-plan deterministic ordering`.
 
-  - [ ]* 8.4 Write property test for determinism
+  - [x] 8.4 Write property test for determinism
     - **Property 15: Daily plan is deterministic**
     - **Validates: Requirements §8**
     - `hypothesis`, min 100 iterations; assert generating the plan twice on identical inputs yields identical output. Tag: `Feature: flowly-mvp, Property 15: Daily plan is deterministic`.
 
-  - [ ]* 8.5 Write property test for fitting within available time
+  - [x] 8.5 Write property test for fitting within available time
     - **Property 16: Daily-plan fitting respects available time**
     - **Validates: Requirements §8**
     - `hypothesis`, min 100 iterations; assert the cumulative `estimated_time` of tasks marked fitting does not exceed available minutes (missing estimate consumes 0). Tag: `Feature: flowly-mvp, Property 16: Daily-plan fitting respects available time`.
 
-  - [ ]* 8.6 Write unit tests for daily-plan edge cases
+  - [x] 8.6 Write unit tests for daily-plan edge cases
     - Tie-breaking when deadlines and priorities are equal, a plan where available time runs out partway through the ordered list, and an all-no-deadline input (empty plan).
     - _Requirements: §8; Design Testing Strategy (unit tests)_
 
