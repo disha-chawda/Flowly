@@ -138,7 +138,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Tie-breaking when deadlines and priorities are equal, a plan where available time runs out partway through the ordered list, and an all-no-deadline input (empty plan).
     - _Requirements: §8; Design Testing Strategy (unit tests)_
 
-- [ ] 9. Checkpoint — pure planning core verified
+- [x] 9. Checkpoint — pure planning core verified
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 10. Implement service layer
