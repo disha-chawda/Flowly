@@ -142,7 +142,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 10. Implement service layer
-  - [ ] 10.1 Implement `app/services/task_service.py`
+  - [x] 10.1 Implement `app/services/task_service.py`
     - Orchestrate create/edit/delete/complete use cases: apply defaults, call the task repository, raise a not-found condition when an id is missing, and return stored entities.
     - _Requirements: §1.1–§1.4, §10; Design §7_
 
