@@ -146,7 +146,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Orchestrate create/edit/delete/complete use cases: apply defaults, call the task repository, raise a not-found condition when an id is missing, and return stored entities.
     - _Requirements: §1.1–§1.4, §10; Design §7_
 
-  - [ ]* 10.2 Write unit tests for task service CRUD and completion round-trips
+  - [x] 10.2 Write unit tests for task service CRUD and completion round-trips
     - **Property 1: Task creation round-trip with defaults**
     - **Property 2: Task edit reflects updates**
     - **Property 3: Delete removes the task**
