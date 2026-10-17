@@ -26,6 +26,20 @@ class CommitmentNotFoundError(Exception):
         super().__init__(f"Commitment {commitment_id} not found")
 
 
+class InvalidCommitmentIntervalError(ValueError):
+    """Raised when a commitment would end at or before it starts.
+
+    Subclasses :class:`ValueError` to stay consistent with the schema-level
+    time validation (Design 10, Requirements 3.1-3.2), so callers that already
+    treat invalid input as ``ValueError`` keep working.
+    """
+
+    def __init__(self, start_time, end_time):
+        self.start_time = start_time
+        self.end_time = end_time
+        super().__init__("end_time must be strictly later than start_time")
+
+
 class CommitmentService:
     def __init__(self, repository: CommitmentRepository):
         self.repository = repository
@@ -58,12 +72,27 @@ class CommitmentService:
 
         Only fields explicitly supplied in ``data`` are changed; omitted fields
         are left untouched. Raises :class:`CommitmentNotFoundError` when the id
-        is missing.
+        is missing, and :class:`InvalidCommitmentIntervalError` when the
+        resulting commitment would end at or before it starts (e.g. updating
+        only ``start_time`` past the stored ``end_time``).
         """
         commitment = self.get_commitment(commitment_id)
         updates = data.model_dump(exclude_unset=True)
         for field, value in updates.items():
             setattr(commitment, field, value)
+
+        # Re-validate the ordering against the *effective* (post-merge) times.
+        # The schema can only compare fields present in the same payload, so a
+        # partial update that touches only start_time or only end_time would
+        # otherwise bypass the check and persist an inverted interval (which
+        # yields a negative compute_workload length). Requirements 3.1-3.2.
+        if commitment.end_time <= commitment.start_time:
+            start, end = commitment.start_time, commitment.end_time
+            # Discard the in-memory mutation so the still-pending change is not
+            # later flushed to storage; the entity reverts to its stored state.
+            self.repository.discard(commitment)
+            raise InvalidCommitmentIntervalError(start, end)
+
         return self.repository.update(commitment)
 
     def delete_commitment(self, commitment_id: int) -> None:

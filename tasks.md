@@ -158,7 +158,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Orchestrate commitment create/edit/delete: apply `source=manual`, call the commitment repository, raise not-found when missing.
     - _Requirements: §3.1–§3.3, §10; Design §7_
 
-  - [ ]* 10.4 Write unit tests for commitment service CRUD round-trips
+  - [x] 10.4 Write unit tests for commitment service CRUD round-trips
     - **Property 7: Commitment creation round-trip with end-after-start validation**
     - **Property 8: Commitment edit and delete**
     - **Validates: Requirements §3.1, §3.2, §3.3, §10**

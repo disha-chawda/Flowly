@@ -24,6 +24,15 @@ class CommitmentRepository:
         self.db.refresh(updated_commitment)
         return updated_commitment
 
+    def discard(self, commitment: Commitment):
+        """Drop any pending in-memory changes to ``commitment``.
+
+        Expires the instance so unflushed attribute mutations are forgotten and
+        the next access reloads the stored values. Used to roll back a rejected
+        update without committing the inverted state.
+        """
+        self.db.expire(commitment)
+
     def delete(self, commitment: Commitment):
         self.db.delete(commitment)
         self.db.commit()
