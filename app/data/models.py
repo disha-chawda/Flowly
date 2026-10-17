@@ -5,6 +5,11 @@ from app.domain.enums import Category
 from app.domain.enums import Completion
 from app.domain.enums import Source
 from app.data.database import Base
+from datetime import datetime, timezone
+
+def _utc_now() -> datetime:
+    # Naive UTC, so it compares cleanly with the other naive datetimes in the app.
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -18,7 +23,7 @@ class Task(Base):
     priority: Mapped[Priority] = mapped_column(default = Priority.MEDIUM)
     category: Mapped[Category] = mapped_column(default = Category.PERSONAL)
     completion: Mapped[Completion] = mapped_column(default = Completion.INCOMPLETE)
-    created_at: Mapped[datetime] = mapped_column(default = datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(default = _utc_now)
     source: Mapped[Source] = mapped_column(default = Source.MANUAL)
 
 class Commitment(Base):
@@ -27,5 +32,5 @@ class Commitment(Base):
     title: Mapped[str] = mapped_column()
     start_time: Mapped[datetime] = mapped_column()
     end_time: Mapped[datetime] = mapped_column()
-    created_at: Mapped[datetime] = mapped_column(default = datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(default = _utc_now)
     source: Mapped[Source] = mapped_column(default = Source.MANUAL)
