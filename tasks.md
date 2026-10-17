@@ -154,7 +154,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - **Validates: Requirements §1.1, §1.2, §1.3, §1.4, §2.2, §2.5, §2.6, §10**
     - Use `hypothesis` where practical (min 100 iterations) over a test database. Tag each with its property line, e.g. `Feature: flowly-mvp, Property 1: Task creation round-trip with defaults`.
 
-  - [ ] 10.3 Implement `app/services/commitment_service.py`
+  - [x] 10.3 Implement `app/services/commitment_service.py`
     - Orchestrate commitment create/edit/delete: apply `source=manual`, call the commitment repository, raise not-found when missing.
     - _Requirements: §3.1–§3.3, §10; Design §7_
 
