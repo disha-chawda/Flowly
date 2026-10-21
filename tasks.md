@@ -164,7 +164,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - **Validates: Requirements §3.1, §3.2, §3.3, §10**
     - `hypothesis` where practical (min 100 iterations). Tag each with its property line.
 
-  - [ ] 10.5 Implement `app/services/dashboard_service.py`
+  - [x] 10.5 Implement `app/services/dashboard_service.py`
     - Build the today view (incomplete tasks relevant to the date; completed stay distinguishable) and upcoming view (incomplete tasks with future deadlines, ordered by deadline ascending); load the day's incomplete tasks and relevant commitments and delegate to the pure workload and daily-plan functions.
     - _Requirements: §4, §5, §6, §7, §8; Design §7, §8, §9_
 
