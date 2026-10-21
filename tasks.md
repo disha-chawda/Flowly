@@ -141,7 +141,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
 - [x] 9. Checkpoint — pure planning core verified
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 10. Implement service layer
+- [x] 10. Implement service layer
   - [x] 10.1 Implement `app/services/task_service.py`
     - Orchestrate create/edit/delete/complete use cases: apply defaults, call the task repository, raise a not-found condition when an id is missing, and return stored entities.
     - _Requirements: §1.1–§1.4, §10; Design §7_
@@ -168,7 +168,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Build the today view (incomplete tasks relevant to the date; completed stay distinguishable) and upcoming view (incomplete tasks with future deadlines, ordered by deadline ascending); load the day's incomplete tasks and relevant commitments and delegate to the pure workload and daily-plan functions.
     - _Requirements: §4, §5, §6, §7, §8; Design §7, §8, §9_
 
-  - [ ]* 10.6 Write unit tests for today/upcoming selection
+  - [x] 10.6 Write unit tests for today/upcoming selection
     - **Property 17: Today view selection**
     - **Property 18: Upcoming view selection and ordering**
     - **Validates: Requirements §5, §6**
