@@ -78,3 +78,36 @@ def test_form_options_match_api_enums():
 
 def test_status_region_is_announced():
     assert re.search(r'id="status"[^>]*aria-live="polite"', INDEX_HTML)
+
+
+def _js_function_body(name: str) -> str:
+    """Source of a top-level `async function name(...) { ... }` in app.js."""
+    match = re.search(rf"async function {name}\(.*?\n  \}}\n", APP_JS, re.S)
+    assert match, f"function {name} missing from app.js"
+    return match.group(0)
+
+
+def test_confirm_dialog_is_labelled_with_cancel_and_confirm_buttons():
+    match = re.search(r'<dialog[^>]*id="confirm-dialog"[^>]*>(.*?)</dialog>', INDEX_HTML, re.S)
+    assert match, "confirm dialog missing from index.html"
+    tag = match.group(0)
+    assert 'aria-labelledby="confirm-title"' in tag
+    assert 'aria-describedby="confirm-message"' in tag
+    assert re.search(r'<button type="button" id="confirm-cancel"', tag)
+    assert re.search(r'<button type="button" id="confirm-ok"', tag)
+
+
+def test_deletes_ask_for_confirmation_before_calling_the_api():
+    for function, remove_call in (
+        ("deleteTask", "TasksApi.remove"),
+        ("deleteCommitment", "CommitmentsApi.remove"),
+    ):
+        body = _js_function_body(function)
+        assert "await confirmAction(" in body, function
+        assert "if (!confirmed)" in body, function
+        # The guard that returns on cancel must come before the API call.
+        assert body.index("if (!confirmed)") < body.index(remove_call), function
+
+
+def test_workload_verdict_is_a_live_region():
+    assert re.search(r'id="workload-verdict"[^>]*role="status"', INDEX_HTML)

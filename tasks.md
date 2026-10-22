@@ -224,7 +224,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Static HTML + vanilla JS that talks only to the REST API: list/create/edit/delete/complete tasks, create/edit/delete commitments, and render the dashboard (today, upcoming, workload summary, daily plan). Clearly distinguish completed vs. incomplete tasks and surface validation messages from the error envelope.
     - _Requirements: §4, §5, §6, §7, §8, §11; Design §2, §3 (decoupled frontend)_
 
-  - [ ]* 15.2 Add frontend usability polish
+  - [x] 15.2 Add frontend usability polish
     - Confirmation on delete, friendly empty states, and clearer workload presentation.
     - _Requirements: §11; Design §2_
 

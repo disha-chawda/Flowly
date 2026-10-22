@@ -25,10 +25,17 @@
     </div>
   </header>
 
-  <!-- Confirmations and non-form errors are announced here. -->
-  <div id="status" class="status" role="status" aria-live="polite" aria-atomic="true"></div>
+  <!--
+    Confirmations and non-form errors are announced here. The bar is sticky so
+    the result of an action stays visible wherever the Student is on the page;
+    messages persist until replaced or dismissed.
+  -->
+  <div class="status-bar">
+    <div id="status" class="status" role="status" aria-live="polite" aria-atomic="true"></div>
+    <button type="button" id="status-dismiss" class="secondary status-dismiss" hidden>Dismiss</button>
+  </div>
 
-  <main id="main">
+  <main id="main" tabindex="-1">
     <!-- ===================== Dashboard ===================== -->
     <section aria-labelledby="dashboard-heading">
       <h2 id="dashboard-heading">Dashboard</h2>
@@ -47,6 +54,9 @@
 
         <section class="card" aria-labelledby="workload-heading">
           <h3 id="workload-heading">Workload summary</h3>
+          <p class="hint">Estimated time of incomplete tasks due on the planning date, compared with the time left after commitments.</p>
+          <!-- Overload verdict: announced only when it changes. -->
+          <p id="workload-verdict" class="verdict" role="status" aria-live="polite" aria-atomic="true"></p>
           <div id="workload"></div>
         </section>
 
@@ -61,7 +71,7 @@
 
     <!-- ===================== Tasks ===================== -->
     <section aria-labelledby="tasks-heading">
-      <h2 id="tasks-heading">Tasks</h2>
+      <h2 id="tasks-heading" tabindex="-1">Tasks</h2>
       <div class="split">
         <form id="task-form" class="card form" novalidate aria-labelledby="task-form-heading">
           <h3 id="task-form-heading">Add a task</h3>
@@ -174,12 +184,22 @@
         </form>
 
         <div class="card">
-          <h3 id="commitment-list-heading">Your commitments</h3>
+          <h3 id="commitment-list-heading" tabindex="-1">Your commitments</h3>
           <ul id="commitment-list" class="item-list" aria-labelledby="commitment-list-heading"></ul>
         </div>
       </div>
     </section>
   </main>
+
+  <!-- Delete confirmation. Cancel (or Escape) leaves data untouched. -->
+  <dialog id="confirm-dialog" class="dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <h2 id="confirm-title">Delete?</h2>
+    <p id="confirm-message"></p>
+    <div class="actions">
+      <button type="button" id="confirm-cancel" class="secondary">Cancel</button>
+      <button type="button" id="confirm-ok" class="danger-solid">Delete</button>
+    </div>
+  </dialog>
 
   <footer class="site-footer">
     <p>Connected to API: <code id="api-base"></code></p>

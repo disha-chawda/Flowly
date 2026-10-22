@@ -11,6 +11,10 @@
  * and field-level details are rendered next to the matching form input.
  *
  * All user-provided text is rendered with textContent (never innerHTML).
+ *
+ * Usability: deletes ask for confirmation first (Cancel leaves data untouched),
+ * empty lists show a friendly hint, and the result of every create / edit /
+ * delete / completion change stays visible in a sticky status bar.
  */
 (function () {
   "use strict";
@@ -204,10 +208,94 @@
     return node;
   }
 
+  let statusToken = 0;
+
+  /**
+   * Show the result of an action in the sticky status bar (Requirement 19.2).
+   * The message stays visible until it is replaced or dismissed. The region is
+   * cleared first and refilled on the next tick so screen readers re-announce
+   * a message even when it is identical to the previous one.
+   * kind: "success" | "error" | "info".
+   */
   function setStatus(message, kind = "success") {
     const status = $("#status");
+    const token = ++statusToken;
+    status.textContent = "";
     status.className = `status status--${kind}`;
-    status.textContent = message;
+    $("#status-dismiss").hidden = false;
+    setTimeout(() => {
+      if (token === statusToken) status.textContent = message;
+    }, 50);
+  }
+
+  function clearStatus() {
+    statusToken++;
+    const status = $("#status");
+    status.textContent = "";
+    status.className = "status";
+    $("#status-dismiss").hidden = true;
+    $("#main").focus();
+  }
+
+  /**
+   * Ask the Student to confirm a destructive action. Resolves to true only when
+   * the confirm button is chosen; Cancel, Escape, or closing the dialog any
+   * other way resolve to false. Falls back to window.confirm where <dialog>
+   * is unsupported.
+   */
+  function confirmAction({ title, message, confirmLabel }) {
+    const dialog = $("#confirm-dialog");
+    if (!dialog || typeof dialog.showModal !== "function") {
+      return Promise.resolve(window.confirm(`${title}\n\n${message}`));
+    }
+    if (dialog.open) return Promise.resolve(false);
+
+    $("#confirm-title").textContent = title;
+    $("#confirm-message").textContent = message;
+    const okButton = $("#confirm-ok");
+    const cancelButton = $("#confirm-cancel");
+    okButton.textContent = confirmLabel;
+    const opener = document.activeElement;
+
+    return new Promise((resolve) => {
+      let settled = false;
+      const onConfirm = () => finish(true);
+      const onDismiss = () => finish(false);
+      const onEscape = (event) => {
+        event.preventDefault();
+        finish(false);
+      };
+
+      function finish(confirmed) {
+        if (settled) return;
+        settled = true;
+        okButton.removeEventListener("click", onConfirm);
+        cancelButton.removeEventListener("click", onDismiss);
+        dialog.removeEventListener("cancel", onEscape);
+        dialog.removeEventListener("close", onDismiss);
+        if (dialog.open) dialog.close();
+        if (opener && opener.isConnected && typeof opener.focus === "function") opener.focus();
+        resolve(confirmed);
+      }
+
+      okButton.addEventListener("click", onConfirm);
+      cancelButton.addEventListener("click", onDismiss);
+      dialog.addEventListener("cancel", onEscape);
+      dialog.addEventListener("close", onDismiss);
+      dialog.showModal();
+      // Default to the safe choice.
+      cancelButton.focus();
+    });
+  }
+
+  /** An empty-state list item: a short headline plus an optional hint. */
+  function emptyState([title, hint]) {
+    return el(
+      "li",
+      { class: "empty" },
+      el("span", { class: "empty-title", text: title }),
+      hint ? el("span", { class: "empty-hint", text: hint }) : null
+    );
   }
 
   function reportError(error, context) {
@@ -340,18 +428,25 @@
     );
   }
 
-  function renderTaskList(listEl, tasks, options, emptyText) {
+  /** `empty` is a [title, hint] pair shown when `tasks` is empty. */
+  function renderTaskList(listEl, tasks, options, empty) {
     listEl.replaceChildren(
-      ...(tasks.length
-        ? tasks.map((task) => renderTaskItem(task, options))
-        : [el("li", { class: "empty", text: emptyText })])
+      ...(tasks.length ? tasks.map((task) => renderTaskItem(task, options)) : [emptyState(empty)])
     );
   }
 
   async function loadTasks() {
     const tasks = await TasksApi.list();
-    renderTaskList($("#task-list-incomplete"), tasks.filter((t) => !isComplete(t)), { editable: true }, "No incomplete tasks.");
-    renderTaskList($("#task-list-complete"), tasks.filter(isComplete), { editable: true }, "No completed tasks.");
+    const incomplete = tasks.filter((t) => !isComplete(t));
+    const complete = tasks.filter(isComplete);
+    const incompleteEmpty = tasks.length
+      ? ["All caught up.", "Every task is complete. Add a new one whenever you're ready."]
+      : ["No tasks yet.", "Add your first task with the form to start planning your day."];
+    renderTaskList($("#task-list-incomplete"), incomplete, { editable: true }, incompleteEmpty);
+    renderTaskList($("#task-list-complete"), complete, { editable: true }, [
+      "No completed tasks yet.",
+      "When you mark a task complete, it moves here.",
+    ]);
   }
 
   // ------------------------------------------------------------------
@@ -432,11 +527,22 @@
   }
 
   async function deleteTask(task) {
+    const confirmed = await confirmAction({
+      title: "Delete this task?",
+      message: `"${task.title}" will be permanently deleted. This cannot be undone.`,
+      confirmLabel: "Delete task",
+    });
+    if (!confirmed) {
+      setStatus(`Kept task "${task.title}". Nothing was deleted.`, "info");
+      return;
+    }
     try {
       await TasksApi.remove(task.id);
       if (state.editingTaskId === task.id) resetTaskForm();
       setStatus(`Deleted task "${task.title}".`);
       await refreshAll();
+      // The deleted item's button is gone; keep focus in a predictable place.
+      $("#tasks-heading").focus();
     } catch (error) {
       reportError(error, "Could not delete the task");
     }
@@ -480,7 +586,10 @@
     list.replaceChildren(
       ...(commitments.length
         ? commitments.map(renderCommitmentItem)
-        : [el("li", { class: "empty", text: "No commitments yet." })])
+        : [emptyState([
+            "No commitments yet.",
+            "Add classes, work shifts, and other fixed obligations so your available time is accurate.",
+          ])])
     );
   }
 
@@ -557,11 +666,21 @@
   }
 
   async function deleteCommitment(c) {
+    const confirmed = await confirmAction({
+      title: "Delete this commitment?",
+      message: `"${c.title}" (${formatDateTime(c.start_time)} to ${formatDateTime(c.end_time)}) will be permanently deleted. This cannot be undone.`,
+      confirmLabel: "Delete commitment",
+    });
+    if (!confirmed) {
+      setStatus(`Kept commitment "${c.title}". Nothing was deleted.`, "info");
+      return;
+    }
     try {
       await CommitmentsApi.remove(c.id);
       if (state.editingCommitmentId === c.id) resetCommitmentForm();
       setStatus(`Deleted commitment "${c.title}".`);
       await refreshAll();
+      $("#commitment-list-heading").focus();
     } catch (error) {
       reportError(error, "Could not delete the commitment");
     }
@@ -571,36 +690,83 @@
   // Dashboard
   // ------------------------------------------------------------------
 
+  /**
+   * Overload verdict as [label, sentence]. The label carries an icon and a
+   * word ("Overloaded" / "On track") so the state never depends on color.
+   */
+  function workloadVerdict(w) {
+    const est = formatMinutes(w.estimated_minutes);
+    const avail = formatMinutes(w.available_minutes);
+    if (w.overloaded) {
+      return ["⚠ Overloaded.", ` ${est} of estimated work but only ${avail} available: ${formatMinutes(-w.difference_minutes)} more than fits.`];
+    }
+    if (w.estimated_minutes === 0) {
+      return ["✓ On track.", ` No estimated work is due on this date, with ${avail} available.`];
+    }
+    if (w.difference_minutes === 0) {
+      return ["✓ On track.", ` ${est} of estimated work exactly fills the ${avail} available.`];
+    }
+    return ["✓ On track.", ` ${est} of estimated work fits in ${avail} available, with ${formatMinutes(w.difference_minutes)} to spare.`];
+  }
+
   function renderWorkload(w) {
-    const container = $("#workload");
+    // Verdict lives in a persistent live region; only touch it when the text
+    // changes so screen readers announce real transitions, not every refresh.
+    const [label, sentence] = workloadVerdict(w);
+    const verdict = $("#workload-verdict");
+    verdict.className = `verdict ${w.overloaded ? "verdict--over" : "verdict--ok"}`;
+    if (verdict.textContent !== label + sentence) {
+      verdict.replaceChildren(el("strong", { text: label }), sentence);
+    }
+
+    // Visual bar (decorative; the legend below states the same thing in text).
+    const available = w.available_minutes;
+    const estimated = w.estimated_minutes;
+    const ratio = available > 0 ? estimated / available : estimated > 0 ? Infinity : 0;
+    const fill = el("div", { class: `load-bar__fill${w.overloaded ? " load-bar__fill--over" : ""}` });
+    fill.style.width = `${Math.min(ratio, 1) * 100}%`;
+    const bar = el("div", { class: "load-bar", "aria-hidden": "true" }, fill);
+    const legend = el("p", {
+      class: "load-legend",
+      text: Number.isFinite(ratio)
+        ? `Estimated work uses ${Math.round(ratio * 100)}% of your available time.`
+        : "Estimated work is due, but no time is available on this date.",
+    });
+
+    const diff = w.difference_minutes;
     const rows = [
-      ["Planning window", w.window_minutes],
-      ["Committed time", w.committed_minutes],
-      ["Available time", w.available_minutes],
-      ["Estimated task time", w.estimated_minutes],
-      ["Difference (available minus estimated)", w.difference_minutes],
+      ["Planning window", formatMinutes(w.window_minutes), w.window_minutes],
+      ["Committed time (classes, shifts)", formatMinutes(w.committed_minutes), w.committed_minutes],
+      ["Available time", formatMinutes(available), available, "workload-key"],
+      ["Estimated task time", formatMinutes(estimated), estimated, "workload-key"],
+      ["Difference", diff >= 0 ? `${formatMinutes(diff)} to spare` : `${formatMinutes(-diff)} over`, diff, "workload-key"],
     ];
     const dl = el(
       "dl",
-      { class: "workload" },
-      ...rows.flatMap(([label, minutes]) => [
-        el("dt", { text: label }),
-        el("dd", { text: `${formatMinutes(minutes)} (${minutes} min)` }),
+      { class: "workload", "aria-label": "Workload breakdown" },
+      ...rows.flatMap(([name, text, minutes, cls]) => [
+        el("dt", { class: cls, text: name }),
+        el("dd", { class: cls }, text, el("span", { class: "minutes", text: ` (${minutes} min)` })),
       ])
     );
 
-    const verdict = w.overloaded
-      ? el("p", { class: "verdict verdict--over", text: `⚠ Overloaded: estimated work exceeds available time by ${formatMinutes(-w.difference_minutes)}.` })
-      : el("p", { class: "verdict verdict--ok", text: `✓ Your work fits: ${formatMinutes(w.difference_minutes)} to spare.` });
-
-    container.replaceChildren(verdict, dl);
+    $("#workload").replaceChildren(bar, legend, dl);
   }
 
   function renderDailyPlan(plan) {
-    $("#plan-available").textContent = `Available time: ${formatMinutes(plan.available_minutes)} (${plan.available_minutes} min).`;
+    const total = plan.planned_tasks.length;
+    const fitting = plan.planned_tasks.filter((t) => t.fits).length;
+    const fitText = total
+      ? ` ${fitting} of ${total} planned ${total === 1 ? "task fits" : "tasks fit"} in that time.`
+      : "";
+    $("#plan-available").textContent =
+      `Available time: ${formatMinutes(plan.available_minutes)} (${plan.available_minutes} min).${fitText}`;
     const list = $("#plan-list");
-    if (!plan.planned_tasks.length) {
-      list.replaceChildren(el("li", { class: "empty", text: "Nothing planned. No incomplete tasks are due on or before this date." }));
+    if (!total) {
+      list.replaceChildren(emptyState([
+        "Nothing to plan for this date.",
+        "Incomplete tasks with a deadline on or before this date will be ordered here.",
+      ]));
       return;
     }
     list.replaceChildren(
@@ -634,8 +800,14 @@
       DashboardApi.workload(date),
       DashboardApi.dailyPlan(date),
     ]);
-    renderTaskList($("#today-list"), today.tasks, { editable: false }, "No tasks due on this date.");
-    renderTaskList($("#upcoming-list"), upcoming.tasks, { editable: false }, "No upcoming tasks.");
+    renderTaskList($("#today-list"), today.tasks, { editable: false }, [
+      `Nothing due on ${formatDate(date)}.`,
+      "Enjoy the breathing room, or get ahead on an upcoming task.",
+    ]);
+    renderTaskList($("#upcoming-list"), upcoming.tasks, { editable: false }, [
+      "No upcoming deadlines.",
+      "Incomplete tasks due after the planning date will show up here.",
+    ]);
     renderWorkload(workload);
     renderDailyPlan(plan);
   }
@@ -652,6 +824,7 @@
 
   function init() {
     $("#api-base").textContent = API_BASE;
+    $("#status-dismiss").addEventListener("click", clearStatus);
 
     const dateInput = $("#plan-date");
     dateInput.value = state.planDate;

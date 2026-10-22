@@ -101,18 +101,49 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 2rem; }
 
 /* ---------- Status messages ---------- */
 
+/* Sticky so the result of an action stays visible while scrolling. */
+.status-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  max-width: 1200px;
+  margin: 1rem auto 0;
+  padding: 0 1.5rem;
+}
 .status {
-  max-width: 1152px;
-  margin: 1rem 1.5rem 0;
+  flex: 1;
   padding: 0.75rem 1rem;
   border-radius: var(--radius);
+  box-shadow: 0 2px 6px rgba(28, 32, 48, 0.12);
 }
-@media (min-width: 1200px) {
-  .status { margin: 1rem auto 0; }
-}
-.status:empty { display: none; }
+/* Collapse visually but keep the live region rendered so it is announced. */
+.status:empty { padding: 0; border: 0; box-shadow: none; }
 .status--success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success); }
 .status--error { background: var(--error-bg); color: var(--danger); border: 1px solid var(--danger); }
+.status--info { background: #eaeefc; color: var(--accent); border: 1px solid var(--accent); }
+.status-dismiss { align-self: center; }
+
+/* Programmatic focus targets (after delete / dismiss) need no outline. */
+main:focus, [tabindex="-1"]:focus { outline: none; }
+
+/* ---------- Confirmation dialog ---------- */
+
+.dialog {
+  max-width: 28rem;
+  width: calc(100% - 2rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  color: var(--text);
+  background: var(--surface);
+}
+.dialog::backdrop { background: rgba(28, 32, 48, 0.45); }
+.dialog h2 { margin-top: 0; font-size: 1.2rem; }
+.dialog p { margin: 0 0 1rem; }
+.dialog .actions { justify-content: flex-end; }
 
 /* ---------- Forms ---------- */
 
@@ -167,6 +198,7 @@ button {
 }
 button.secondary { background: #fff; color: var(--accent); }
 button.danger { background: #fff; color: var(--danger); border-color: var(--danger); }
+button.danger-solid { background: var(--danger); color: #fff; border-color: var(--danger); }
 button:hover { filter: brightness(0.95); }
 
 /* ---------- Task lists ---------- */
@@ -216,7 +248,16 @@ button:hover { filter: brightness(0.95); }
 .badge--incomplete { color: var(--accent); background: #eaeefc; }
 .badge--nofit { color: var(--warning); background: var(--warning-bg); }
 
-.empty { color: var(--muted); font-style: italic; border: none; padding: 0.25rem 0; }
+.empty {
+  list-style: none;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  color: var(--muted);
+}
+.empty-title { display: block; font-weight: 600; color: var(--text); }
+.empty-hint { display: block; font-size: 0.9rem; }
 
 /* ---------- Workload + plan ---------- */
 
@@ -228,10 +269,30 @@ button:hover { filter: brightness(0.95); }
 }
 .workload dt { color: var(--muted); }
 .workload dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.workload .workload-key { font-weight: 600; color: var(--text); }
+.workload .minutes { font-weight: 400; color: var(--muted); font-size: 0.85rem; }
 
-.verdict { padding: 0.5rem 0.75rem; border-radius: 6px; font-weight: 600; margin: 0 0 0.75rem; }
+.verdict { padding: 0.5rem 0.75rem; border-radius: 6px; margin: 0 0 0.75rem; border: 1px solid currentColor; }
+.verdict:empty { display: none; }
 .verdict--ok { background: var(--success-bg); color: var(--success); }
-.verdict--over { background: var(--warning-bg); color: var(--warning); }
+/* Overload adds a thicker left rule on top of the icon + wording. */
+.verdict--over { background: var(--warning-bg); color: var(--warning); border-left-width: 6px; }
+
+.load-bar {
+  height: 0.75rem;
+  border: 1px solid #8a90a2;
+  border-radius: 999px;
+  background: #eef0f5;
+  overflow: hidden;
+}
+.load-bar__fill { height: 100%; background: var(--success); }
+/* Striped fill so "over capacity" is not conveyed by color alone. */
+.load-bar__fill--over {
+  background: repeating-linear-gradient(
+    45deg, var(--warning) 0 6px, #c97a1a 6px 12px
+  );
+}
+.load-legend { font-size: 0.9rem; color: var(--muted); margin: 0.35rem 0 0.75rem; }
 
 .plan-list { padding-left: 1.5rem; }
 .plan-item { margin-bottom: 0.6rem; }
