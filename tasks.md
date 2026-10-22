@@ -188,7 +188,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - `POST /commitments` (201), `GET /commitments` (200), `GET /commitments/{id}` (200/404), `PUT /commitments/{id}` (200/404/422), `DELETE /commitments/{id}` (204/404), wiring schemas and the commitment service.
     - _Requirements: §3.1–§3.4; Design §6, §7_
 
-  - [ ] 12.3 Implement `app/api/dashboard.py`
+  - [x] 12.3 Implement `app/api/dashboard.py`
     - `GET /dashboard/today`, `/upcoming`, `/workload`, `/daily-plan` (all 200, optional `date`/range query params), wiring the dashboard service and response schemas.
     - _Requirements: §4, §5, §6, §7, §8; Design §6_
 
