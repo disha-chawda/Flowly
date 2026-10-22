@@ -174,8 +174,8 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - **Validates: Requirements §5, §6**
     - `hypothesis` where practical (min 100 iterations). Tag each with its property line.
 
-- [ ] 11. Implement centralized error handling
-  - [ ] 11.1 Implement `app/api/errors.py`
+- [x] 11. Implement centralized error handling
+  - [x] 11.1 Implement `app/api/errors.py`
     - Register exception handlers that serialize validation failures (`422`) and not-found conditions (`404`) into the single error envelope `{ "error": { "type", "message", "details":[{"field","issue"}] } }` from Design Error Handling.
     - _Requirements: §11; Design §6, Error Handling_
 
