@@ -219,7 +219,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
 - [x] 14. Checkpoint — backend and tests verified
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 15. Build the minimal decoupled frontend
+- [x] 15. Build the minimal decoupled frontend
   - [x] 15.1 Implement the core frontend in `frontend/`
     - Static HTML + vanilla JS that talks only to the REST API: list/create/edit/delete/complete tasks, create/edit/delete commitments, and render the dashboard (today, upcoming, workload summary, daily plan). Clearly distinguish completed vs. incomplete tasks and surface validation messages from the error envelope.
     - _Requirements: §4, §5, §6, §7, §8, §11; Design §2, §3 (decoupled frontend)_
@@ -228,8 +228,8 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Confirmation on delete, friendly empty states, and clearer workload presentation.
     - _Requirements: §11; Design §2_
 
-- [ ] 16. Final wiring and run
-  - [ ] 16.1 Wire the app end to end and document how to run it
+- [x] 16. Final wiring and run
+  - [x] 16.1 Wire the app end to end and document how to run it
     - Confirm `app/main.py` serves the API and the `frontend/` is reachable (static mount or separate static serving), and add README/run notes with the uvicorn command and test command. No new business logic.
     - _Requirements: §4, §9, §12; Design §3, §4_
 
