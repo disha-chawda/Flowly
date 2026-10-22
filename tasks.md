@@ -216,7 +216,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Create tasks and commitments via the API, read them back through a fresh database session, and assert the data survived (Requirements §9).
     - _Requirements: §9; Design Testing Strategy (persistence)_
 
-- [ ] 14. Checkpoint — backend and tests verified
+- [x] 14. Checkpoint — backend and tests verified
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 15. Build the minimal decoupled frontend
