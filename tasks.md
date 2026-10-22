@@ -184,7 +184,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - `POST /tasks` (201), `GET /tasks` (200), `GET /tasks/{id}` (200/404), `PUT /tasks/{id}` (200/404/422), `DELETE /tasks/{id}` (204/404), `PATCH /tasks/{id}/completion` (200/404/422), wiring schemas and the task service.
     - _Requirements: §1.1–§1.4; Design §6, §7_
 
-  - [ ] 12.2 Implement `app/api/commitments.py`
+  - [x] 12.2 Implement `app/api/commitments.py`
     - `POST /commitments` (201), `GET /commitments` (200), `GET /commitments/{id}` (200/404), `PUT /commitments/{id}` (200/404/422), `DELETE /commitments/{id}` (204/404), wiring schemas and the commitment service.
     - _Requirements: §3.1–§3.4; Design §6, §7_
 
