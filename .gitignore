@@ -1,5 +1,8 @@
+*.db
+*.xml
 __pycache__/
 *.pyc
 .hypothesis/
-.pytest_cache/
-.env
+*_out.txt
+*_tmp.txt
+*_report.txt

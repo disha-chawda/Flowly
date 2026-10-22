@@ -233,7 +233,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Confirm `app/main.py` serves the API and the `frontend/` is reachable (static mount or separate static serving), and add README/run notes with the uvicorn command and test command. No new business logic.
     - _Requirements: §4, §9, §12; Design §3, §4_
 
-- [ ] 17. Final checkpoint — full MVP verified
+- [x] 17. Final checkpoint — full MVP verified
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
