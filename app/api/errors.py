@@ -121,7 +121,7 @@ async def _handle_request_validation_error(
         for err in exc.errors()
     ]
     return error_response(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         type=VALIDATION_ERROR,
         message="Request validation failed",
         details=details,
@@ -163,7 +163,7 @@ async def _handle_invalid_commitment_interval(
     ``end_time`` so clients surface it like any other validation failure.
     """
     return error_response(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         type=VALIDATION_ERROR,
         message="Request validation failed",
         details=[{"field": "end_time", "issue": str(exc)}],

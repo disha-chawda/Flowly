@@ -15,6 +15,8 @@ create at startup.
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 # Imported for the registration side effect: binding the ORM models to the
@@ -26,6 +28,11 @@ from app.api.tasks import router as tasks_router
 from app.api.commitments import router as commitments_router
 from app.api.dashboard import router as dashboard_router
 
+@asynccontextmanager
+async def lifespan(app):
+    create_all()
+    yield
+
 
 def create_app() -> FastAPI:
     """Build and return the fully wired FLOWLY FastAPI application.
@@ -34,7 +41,7 @@ def create_app() -> FastAPI:
     ensures the database tables exist on startup via the ``startup`` event so
     the schema is created once when the application boots.
     """
-    app = FastAPI(title="FLOWLY")
+    app = FastAPI(title="FLOWLY", lifespan = lifespan)
 
     register_error_handlers(app)
 
@@ -42,10 +49,7 @@ def create_app() -> FastAPI:
     app.include_router(commitments_router)
     app.include_router(dashboard_router)
 
-    @app.on_event("startup")
-    def _create_tables() -> None:
-        """Create database tables on application startup (Design §3)."""
-        create_all()
+
 
     return app
 
