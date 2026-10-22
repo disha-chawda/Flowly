@@ -196,23 +196,23 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Create the FastAPI app, register the tasks/commitments/dashboard routers and the error handlers, and ensure tables are created on startup.
     - _Requirements: §4, §9; Design §3, §4_
 
-- [ ] 13. Write API / integration tests (FastAPI TestClient)
-  - [ ] 13.1 Implement `tests/api/test_tasks_api.py`
+- [x] 13. Write API / integration tests (FastAPI TestClient)
+  - [x] 13.1 Implement `tests/api/test_tasks_api.py`
     - **Property 5: Title validation rejects empty/whitespace/over-length, with no persistence**
     - **Property 6: Estimated-time validation**
     - **Validates: Requirements §2.1, §2.4, §10**
     - Task CRUD + completion toggle happy paths with status codes (201/200/204), 404 on missing id for GET/PUT/DELETE/PATCH, and 422 with the error envelope for invalid bodies. Use `hypothesis` for the validation properties (min 100 iterations) and tag each, e.g. `Feature: flowly-mvp, Property 5: Title validation rejects empty/whitespace/over-length, with no persistence`.
 
-  - [ ] 13.2 Implement `tests/api/test_commitments_api.py`
+  - [x] 13.2 Implement `tests/api/test_commitments_api.py`
     - **Property 7: Commitment creation round-trip with end-after-start validation**
     - **Validates: Requirements §3.1, §3.4, §10**
     - Commitment CRUD happy paths with status codes (201/200/204), 404 on missing id, and 422 (end_time not after start_time) with the error envelope. Tag the property test accordingly.
 
-  - [ ] 13.3 Implement `tests/api/test_dashboard_api.py`
+  - [x] 13.3 Implement `tests/api/test_dashboard_api.py`
     - Assert `/dashboard/today`, `/upcoming`, `/workload`, `/daily-plan` return 200 and the documented response shapes, including overlapping commitments and tasks with/without deadlines.
     - _Requirements: §4, §5, §6, §7, §8; Design §6, Testing Strategy_
 
-  - [ ] 13.4 Implement a persistence integration test
+  - [x] 13.4 Implement a persistence integration test
     - Create tasks and commitments via the API, read them back through a fresh database session, and assert the data survived (Requirements §9).
     - _Requirements: §9; Design Testing Strategy (persistence)_
 
