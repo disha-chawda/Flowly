@@ -179,7 +179,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - Register exception handlers that serialize validation failures (`422`) and not-found conditions (`404`) into the single error envelope `{ "error": { "type", "message", "details":[{"field","issue"}] } }` from Design Error Handling.
     - _Requirements: §11; Design §6, Error Handling_
 
-- [ ] 12. Implement API routers
+- [x] 12. Implement API routers
   - [x] 12.1 Implement `app/api/tasks.py`
     - `POST /tasks` (201), `GET /tasks` (200), `GET /tasks/{id}` (200/404), `PUT /tasks/{id}` (200/404/422), `DELETE /tasks/{id}` (204/404), `PATCH /tasks/{id}/completion` (200/404/422), wiring schemas and the task service.
     - _Requirements: §1.1–§1.4; Design §6, §7_
@@ -192,7 +192,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - `GET /dashboard/today`, `/upcoming`, `/workload`, `/daily-plan` (all 200, optional `date`/range query params), wiring the dashboard service and response schemas.
     - _Requirements: §4, §5, §6, §7, §8; Design §6_
 
-  - [ ] 12.4 Implement `app/main.py`
+  - [x] 12.4 Implement `app/main.py`
     - Create the FastAPI app, register the tasks/commitments/dashboard routers and the error handlers, and ensure tables are created on startup.
     - _Requirements: §4, §9; Design §3, §4_
 
