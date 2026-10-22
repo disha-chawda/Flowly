@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--
+    API base URL. Leave empty to use the same origin the page is served from
+    (or http://localhost:8000 when opened from file://). It can also be
+    overridden per visit with ?api=http://host:port in the page URL.
+  -->
+  <meta name="flowly-api-base" content="">
+  <title>FLOWLY | Student's Pulse</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <h1>FLOWLY <span class="tagline">| Student's Pulse</span></h1>
+    <div class="date-control">
+      <label for="plan-date">Planning date</label>
+      <input type="date" id="plan-date" name="plan-date">
+      <button type="button" id="today-btn" class="secondary">Today</button>
+    </div>
+  </header>
+
+  <!-- Confirmations and non-form errors are announced here. -->
+  <div id="status" class="status" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <main id="main">
+    <!-- ===================== Dashboard ===================== -->
+    <section aria-labelledby="dashboard-heading">
+      <h2 id="dashboard-heading">Dashboard</h2>
+      <div class="grid">
+        <section class="card" aria-labelledby="today-heading">
+          <h3 id="today-heading">Today's tasks</h3>
+          <p class="hint">Tasks due on <span id="today-date-label"></span>.</p>
+          <ul id="today-list" class="task-list"></ul>
+        </section>
+
+        <section class="card" aria-labelledby="upcoming-heading">
+          <h3 id="upcoming-heading">Upcoming tasks</h3>
+          <p class="hint">Incomplete tasks due after the planning date, earliest first.</p>
+          <ul id="upcoming-list" class="task-list"></ul>
+        </section>
+
+        <section class="card" aria-labelledby="workload-heading">
+          <h3 id="workload-heading">Workload summary</h3>
+          <div id="workload"></div>
+        </section>
+
+        <section class="card" aria-labelledby="plan-heading">
+          <h3 id="plan-heading">Daily plan</h3>
+          <p class="hint">Ordered by deadline, then priority, then creation time. Tasks without a deadline are not included.</p>
+          <p id="plan-available" class="hint"></p>
+          <ol id="plan-list" class="plan-list"></ol>
+        </section>
+      </div>
+    </section>
+
+    <!-- ===================== Tasks ===================== -->
+    <section aria-labelledby="tasks-heading">
+      <h2 id="tasks-heading">Tasks</h2>
+      <div class="split">
+        <form id="task-form" class="card form" novalidate aria-labelledby="task-form-heading">
+          <h3 id="task-form-heading">Add a task</h3>
+          <div class="form-errors" data-form-errors role="alert" hidden></div>
+
+          <div class="field">
+            <label for="task-title">Title <span class="required">(required)</span></label>
+            <input id="task-title" name="title" type="text" autocomplete="off"
+                   aria-describedby="task-title-error">
+            <p id="task-title-error" class="field-error" data-error-for="title" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="task-description">Description</label>
+            <textarea id="task-description" name="description" rows="3"
+                      aria-describedby="task-description-error"></textarea>
+            <p id="task-description-error" class="field-error" data-error-for="description" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="task-deadline">Deadline</label>
+            <input id="task-deadline" name="deadline" type="datetime-local"
+                   aria-describedby="task-deadline-error">
+            <p id="task-deadline-error" class="field-error" data-error-for="deadline" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="task-estimated">Estimated time (minutes)</label>
+            <input id="task-estimated" name="estimated_time" type="number" inputmode="numeric" step="1"
+                   aria-describedby="task-estimated-error">
+            <p id="task-estimated-error" class="field-error" data-error-for="estimated_time" hidden></p>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="task-priority">Priority</label>
+              <select id="task-priority" name="priority" aria-describedby="task-priority-error">
+                <option value="High">High</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="Low">Low</option>
+              </select>
+              <p id="task-priority-error" class="field-error" data-error-for="priority" hidden></p>
+            </div>
+
+            <div class="field">
+              <label for="task-category">Category</label>
+              <select id="task-category" name="category" aria-describedby="task-category-error">
+                <option value="Academic">Academic</option>
+                <option value="Work">Work</option>
+                <option value="Personal" selected>Personal</option>
+                <option value="Career">Career</option>
+              </select>
+              <p id="task-category-error" class="field-error" data-error-for="category" hidden></p>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="submit" data-submit>Add task</button>
+            <button type="button" class="secondary" data-cancel hidden>Cancel edit</button>
+          </div>
+        </form>
+
+        <div class="card">
+          <section aria-labelledby="incomplete-heading">
+            <h3 id="incomplete-heading">Incomplete</h3>
+            <ul id="task-list-incomplete" class="task-list"></ul>
+          </section>
+          <section aria-labelledby="complete-heading">
+            <h3 id="complete-heading">Completed</h3>
+            <ul id="task-list-complete" class="task-list"></ul>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Commitments ===================== -->
+    <section aria-labelledby="commitments-heading">
+      <h2 id="commitments-heading">Commitments</h2>
+      <p class="hint">Fixed obligations such as classes and work shifts. They reduce your available time.</p>
+      <div class="split">
+        <form id="commitment-form" class="card form" novalidate aria-labelledby="commitment-form-heading">
+          <h3 id="commitment-form-heading">Add a commitment</h3>
+          <div class="form-errors" data-form-errors role="alert" hidden></div>
+
+          <div class="field">
+            <label for="commitment-title">Title <span class="required">(required)</span></label>
+            <input id="commitment-title" name="title" type="text" autocomplete="off"
+                   aria-describedby="commitment-title-error">
+            <p id="commitment-title-error" class="field-error" data-error-for="title" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="commitment-start">Start time <span class="required">(required)</span></label>
+            <input id="commitment-start" name="start_time" type="datetime-local"
+                   aria-describedby="commitment-start-error">
+            <p id="commitment-start-error" class="field-error" data-error-for="start_time" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="commitment-end">End time <span class="required">(required)</span></label>
+            <input id="commitment-end" name="end_time" type="datetime-local"
+                   aria-describedby="commitment-end-error">
+            <p id="commitment-end-error" class="field-error" data-error-for="end_time" hidden></p>
+          </div>
+
+          <div class="actions">
+            <button type="submit" data-submit>Add commitment</button>
+            <button type="button" class="secondary" data-cancel hidden>Cancel edit</button>
+          </div>
+        </form>
+
+        <div class="card">
+          <h3 id="commitment-list-heading">Your commitments</h3>
+          <ul id="commitment-list" class="item-list" aria-labelledby="commitment-list-heading"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Connected to API: <code id="api-base"></code></p>
+  </footer>
+</body>
+</html>
