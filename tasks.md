@@ -180,7 +180,7 @@ analytics, auth, or multi-user work appears here (Requirements §15; Design Scop
     - _Requirements: §11; Design §6, Error Handling_
 
 - [ ] 12. Implement API routers
-  - [ ] 12.1 Implement `app/api/tasks.py`
+  - [x] 12.1 Implement `app/api/tasks.py`
     - `POST /tasks` (201), `GET /tasks` (200), `GET /tasks/{id}` (200/404), `PUT /tasks/{id}` (200/404/422), `DELETE /tasks/{id}` (204/404), `PATCH /tasks/{id}/completion` (200/404/422), wiring schemas and the task service.
     - _Requirements: §1.1–§1.4; Design §6, §7_
 
