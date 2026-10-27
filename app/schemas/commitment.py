@@ -39,6 +39,14 @@ class CommitmentUpdate(BaseModel):
     start_time: datetime | None = None
     end_time: datetime | None = None
 
+    @field_validator("title", "start_time", "end_time")
+    @classmethod
+    def _reject_null(cls, value):
+        # Omitting a field is allowed; sending an explicit null is not.
+        if value is None:
+            raise ValueError("must not be null")
+        return value
+
     @field_validator("title")
     @classmethod
     def _check_title(cls, value: str | None) -> str | None:
