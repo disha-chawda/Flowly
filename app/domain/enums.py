@@ -17,3 +17,4 @@ class Completion(str, Enum):
 
 class Source(str, Enum):
     MANUAL = "manual"
+    ICS_IMPORT = "ics_import"

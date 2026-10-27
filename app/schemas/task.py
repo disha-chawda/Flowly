@@ -32,6 +32,14 @@ class TaskCreate(BaseModel):
     def _check_title(cls, value: str) -> str:
         return _validate_title(value)
 
+    @field_validator("source")
+    @classmethod
+    def _manual_only(cls, value: Source) -> Source:
+        # Only the calendar import may create ics_import rows (Design §8).
+        if value is not Source.MANUAL:
+            raise ValueError("source must be 'manual'")
+        return value
+
 
 class TaskUpdate(BaseModel):
     title: str | None = None
