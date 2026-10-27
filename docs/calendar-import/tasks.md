@@ -41,7 +41,7 @@ Ground rules for every task:
     - _Requirements: 15.1, 15.2, 15.3, 16.1; Design §11_
 
 - [ ] 2. Extend the domain, model, and startup checks
-  - [ ] 2.1 Add `Source.ICS_IMPORT` and keep `POST /commitments` manual-only
+  - [x] 2.1 Add `Source.ICS_IMPORT` and keep `POST /commitments` manual-only
     - Add `ICS_IMPORT = "ics_import"` to `Source` in `app/domain/enums.py`.
     - In the same commit, add the `_manual_only` `field_validator("source")` to `CommitmentCreate` in `app/schemas/commitment.py`, so no commit lets clients create `ics_import` rows.
     - New test file `tests/unit/test_commitment_source_manual_only.py`: `CommitmentCreate(source="ics_import")` raises `ValidationError` with "source must be 'manual'"; `source="manual"` and the default still pass; `CommitmentUpdate` has no `source` field.
