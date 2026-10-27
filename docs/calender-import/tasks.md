@@ -33,8 +33,8 @@ Ground rules for every task:
 
 ## Tasks
 
-- [ ] 1. Pin and install dependencies
-  - [ ] 1.1 Add the three pins to `requirements.txt` and install
+- [x] 1. Pin and install dependencies
+  - [x] 1.1 Add the three pins to `requirements.txt` and install
     - Append `python-multipart==0.0.32`, `tzdata==2026.5`, and `python-dateutil==2.9.0.post0` to `requirements.txt`; leave the existing pins unchanged.
     - Install with `python -m pip install -r requirements.txt` and confirm `import python_multipart`, `import tzdata`, and `import dateutil` succeed, and that `tzdata`'s version is `2026.5`.
     - Run the existing suite (`python -m pytest`) to confirm the upgrade from the installed `tzdata` 2023.3 breaks nothing.
