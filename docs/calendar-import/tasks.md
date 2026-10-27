@@ -58,8 +58,8 @@ Ground rules for every task:
     - New test file `tests/unit/test_schema_check.py`: against a temporary SQLite file whose `commitments` table was created without `import_key`, `check_schema` raises `RuntimeError` naming `import_key`, `flowly.db`, and README "Calendar import"; against a fresh `create_all` schema and against an empty database it returns normally.
     - _Requirements: 14.2, 14.3, 14.4; Design §7_
 
-- [ ] 3. Create the pure `app/ics` package
-  - [ ] 3.1 Implement `app/ics/__init__.py` and `app/ics/types.py`
+- [x] 3. Create the pure `app/ics` package
+  - [x] 3.1 Implement `app/ics/__init__.py` and `app/ics/types.py`
     - Define `SkipReason` (all 13 codes, including `past_event`), `ImportLimits`, `ImportRecord`, `SkippedItem` (with `count: int = 1`), `ParseResult`, and `InvalidCalendarError(issue)` exactly as in Design §4.1. `__init__.py` re-exports the public names as later modules land.
     - New test file `tests/unit/test_ics_boundary.py`: parse every `app/ics/*.py` with `ast` and assert no import of `sqlalchemy`, `fastapi`, `starlette`, `app.data`, `app.services`, `app.api`, or `dateutil`, and no use of `datetime.now`, `date.today`, `time.time`, `os.environ`, or `open(`. The test covers each module added later automatically.
     - _Requirements: 10.4, 12.1, 12.2, 12.3; Design §1, §4.1_
