@@ -555,7 +555,7 @@ multiple of `INTERVAL` are examined.
 | `DAILY` | the day itself | `BYMONTH`, `BYMONTHDAY`, `BYDAY` |
 | `WEEKLY` | days of the week in `BYDAY` | `BYMONTH` |
 | `MONTHLY` | `BYMONTHDAY` days (negative from month end; invalid days such as the 31st in April are dropped); else `BYDAY` within the month (ordinal or all) | `BYMONTH`; `BYDAY` when `BYMONTHDAY` is present |
-| `YEARLY` | `BYMONTH` months (or `DTSTART`'s); in each, `BYMONTHDAY` days, else `BYDAY` within the month. With no `BYMONTH`, `BYDAY` is expanded within the year | `BYDAY` when `BYMONTHDAY` is present |
+| `YEARLY` | With `BYMONTH`: in each `BYMONTH` month, `BYMONTHDAY` days, else `BYDAY` within the month, else `DTSTART`'s day of the month. With no `BYMONTH`: `BYMONTHDAY` days in every month, else `BYDAY` within the whole year, else `DTSTART`'s month and day | `BYDAY` when `BYMONTHDAY` is present |
 
 **Expansion bounds** (in source wall time):
 
