@@ -26,7 +26,7 @@ from fastapi.staticfiles import StaticFiles
 # Imported for the registration side effect: binding the ORM models to the
 # declarative ``Base.metadata`` so ``create_all`` can create their tables.
 from app.data import models  # noqa: F401
-from app.data.database import create_all
+from app.data.database import check_schema, create_all, engine
 from app.api.errors import register_error_handlers
 from app.api.tasks import router as tasks_router
 from app.api.commitments import router as commitments_router
@@ -42,6 +42,9 @@ FRONTEND_MOUNT = "/app"
 @asynccontextmanager
 async def lifespan(app):
     create_all()
+    # Refuse to start against an old commitments table that lacks import_key
+    # (Requirement 14.3); create_all() does not add missing columns.
+    check_schema(engine)
     yield
 
 

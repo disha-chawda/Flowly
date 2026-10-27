@@ -40,7 +40,7 @@ Ground rules for every task:
     - Run the existing suite (`python -m pytest`) to confirm the upgrade from the installed `tzdata` 2023.3 breaks nothing.
     - _Requirements: 15.1, 15.2, 15.3, 16.1; Design §11_
 
-- [ ] 2. Extend the domain, model, and startup checks
+- [x] 2. Extend the domain, model, and startup checks
   - [x] 2.1 Add `Source.ICS_IMPORT` and keep `POST /commitments` manual-only
     - Add `ICS_IMPORT = "ics_import"` to `Source` in `app/domain/enums.py`.
     - In the same commit, add the `_manual_only` `field_validator("source")` to `CommitmentCreate` in `app/schemas/commitment.py`, so no commit lets clients create `ics_import` rows.
@@ -53,7 +53,7 @@ Ground rules for every task:
     - After this task the developer's existing `flowly.db` no longer matches the model. Tell the user it must be recreated; don't delete it.
     - _Requirements: 5.1, 5.2, 16.2; Design §2_
 
-  - [ ] 2.3 Add the startup schema check
+  - [x] 2.3 Add the startup schema check
     - Implement `check_schema(engine)` in `app/data/database.py` as in Design §7, and call it in `lifespan` in `app/main.py` right after `create_all()`.
     - New test file `tests/unit/test_schema_check.py`: against a temporary SQLite file whose `commitments` table was created without `import_key`, `check_schema` raises `RuntimeError` naming `import_key`, `flowly.db`, and README "Calendar import"; against a fresh `create_all` schema and against an empty database it returns normally.
     - _Requirements: 14.2, 14.3, 14.4; Design §7_
