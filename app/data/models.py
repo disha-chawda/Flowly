@@ -34,3 +34,6 @@ class Commitment(Base):
     end_time: Mapped[datetime] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(default = _utc_now)
     source: Mapped[Source] = mapped_column(default = Source.MANUAL)
+    # Set only on calendar-imported rows so a re-import can find them; NULL for
+    # manual rows. Unique among non-null values (SQL UNIQUE allows many NULLs).
+    import_key: Mapped[str | None] = mapped_column(nullable = True, unique = True, default = None)

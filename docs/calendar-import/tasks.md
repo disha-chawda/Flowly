@@ -47,7 +47,7 @@ Ground rules for every task:
     - New test file `tests/unit/test_commitment_source_manual_only.py`: `CommitmentCreate(source="ics_import")` raises `ValidationError` with "source must be 'manual'"; `source="manual"` and the default still pass; `CommitmentUpdate` has no `source` field.
     - _Requirements: 9.1, 9.4, 16.1; Design §2, §8_
 
-  - [ ] 2.2 Add `Commitment.import_key`
+  - [x] 2.2 Add `Commitment.import_key`
     - Add `import_key: Mapped[str | None] = mapped_column(nullable=True, unique=True, default=None)` to `Commitment` in `app/data/models.py`. Do not add it to `CommitmentRead`.
     - New test file `tests/unit/test_commitment_import_key.py` (in-memory SQLite): many rows with `NULL` keys are allowed; two rows with the same non-null key raise `IntegrityError`; `CommitmentRead.model_fields` has no `import_key`.
     - After this task the developer's existing `flowly.db` no longer matches the model. Tell the user it must be recreated; don't delete it.
