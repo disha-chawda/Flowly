@@ -41,10 +41,11 @@ Ground rules for every task:
     - _Requirements: 15.1, 15.2, 15.3, 16.1; Design §11_
 
 - [x] 2. Extend the domain, model, and startup checks
-  - [x] 2.1 Add `Source.ICS_IMPORT` and keep `POST /commitments` manual-only
+  - [x] 2.1 Add `Source.ICS_IMPORT` and keep `POST /commitments` and `POST /tasks` manual-only
     - Add `ICS_IMPORT = "ics_import"` to `Source` in `app/domain/enums.py`.
-    - In the same commit, add the `_manual_only` `field_validator("source")` to `CommitmentCreate` in `app/schemas/commitment.py`, so no commit lets clients create `ics_import` rows.
+    - In the same commit, add the `_manual_only` `field_validator("source")` to `CommitmentCreate` in `app/schemas/commitment.py` and to `TaskCreate` in `app/schemas/task.py` (which shares the `Source` enum), so no commit lets clients create `ics_import` rows.
     - New test file `tests/unit/test_commitment_source_manual_only.py`: `CommitmentCreate(source="ics_import")` raises `ValidationError` with "source must be 'manual'"; `source="manual"` and the default still pass; `CommitmentUpdate` has no `source` field.
+    - New test file `tests/api/test_task_source_manual_only.py` (in-memory SQLite): `POST /tasks` with `"source": "manual"` or no `source` returns 201 with `source` manual; `"source": "ics_import"` returns 422 with a `source` detail containing "source must be 'manual'" and stores nothing; `TaskCreate(source="ics_import")` raises `ValidationError`; `TaskUpdate` has no `source` field.
     - _Requirements: 9.1, 9.4, 16.1; Design §2, §8_
 
   - [x] 2.2 Add `Commitment.import_key`
@@ -64,66 +65,66 @@ Ground rules for every task:
     - New test file `tests/unit/test_ics_boundary.py`: parse every `app/ics/*.py` with `ast` and assert no import of `sqlalchemy`, `fastapi`, `starlette`, `app.data`, `app.services`, `app.api`, or `dateutil`, and no use of `datetime.now`, `date.today`, `time.time`, `os.environ`, or `open(`. The test covers each module added later automatically.
     - _Requirements: 10.4, 12.1, 12.2, 12.3; Design §1, §4.1_
 
-- [ ] 4. Implement value parsing (`app/ics/values.py`)
-  - [ ] 4.1 Implement scalar value parsers
+- [x] 4. Implement value parsing (`app/ics/values.py`)
+  - [x] 4.1 Implement scalar value parsers
     - DATE-TIME (`YYYYMMDDTHHMMSS[Z]`, second `60` rejected), DATE (`YYYYMMDD` or `VALUE=DATE`), DURATION (weeks; or days plus `T` hours/minutes/seconds; optional sign), and TEXT unescaping (`\\`, `\;`, `\,`, `\n`/`\N`), each returning a typed value or raising a private parse error that the event pipeline maps to `malformed_event`.
     - Duration results keep the nominal (weeks/days) and exact (H/M/S) parts separate for Design §4.4.
     - New test file `tests/unit/test_ics_values.py`: valid and invalid examples for each type, including `PT0S`, `-PT1H`, `P1W`, `P1DT2H`, `P` (invalid), `20260230T090000` (invalid date), and every escape.
     - _Requirements: 3.12, 7.1, 8.1, 8.7; Design §4.3_
 
-  - [ ] 4.2 Implement `RRULE` parsing and validation
+  - [x] 4.2 Implement `RRULE` parsing and validation
     - Parse `NAME=VALUE;…` into a frozen `RuleSpec` (freq, interval, count, until, byday with optional ordinals, bymonthday, bymonth, wkst).
     - Classify problems per Design §5.2: syntax errors, repeated parts, `COUNT` with `UNTIL`, `INTERVAL < 1`, `COUNT < 1`, and out-of-range numbers → malformed; any other `FREQ` or part, ordinal `BYDAY` with `DAILY`/`WEEKLY`, and `BYMONTHDAY` with `WEEKLY` → unsupported.
     - New test file `tests/unit/test_ics_rrule.py`: one example per row of the Design §5.2 table, plus the ordinal ranges (±1..5 for `MONTHLY` and `YEARLY`+`BYMONTH`, ±1..53 for `YEARLY` alone).
     - _Requirements: 6.4, 6.10, 8.7; Design §4.3, §5.2_
 
-- [ ] 5. Implement recurrence expansion (`app/ics/recurrence.py`)
-  - [ ] 5.1 Implement the period walk from `DTSTART`
+- [x] 5. Implement recurrence expansion (`app/ics/recurrence.py`)
+  - [x] 5.1 Implement the period walk from `DTSTART`
     - `expand(rule, dtstart, lo, hi, until=None, budget=…)` works in naive source wall time and returns sorted original starts in `[lo, hi]`. Implement the defaults from `DTSTART`, periods aligned to `INTERVAL` (weeks start on `WKST`), the candidate table for each `FREQ`, invalid-day dropping, `DTSTART` as the first occurrence counted toward `COUNT`, `UNTIL` (inclusive), and stopping when a period starts after `hi` or `UNTIL` (Design §5.4). Always start at period 0 in this task.
     - New test file `tests/unit/test_ics_recurrence_edge_cases.py`: weekly `BYDAY=MO,WE,FR` with `DTSTART` on a Wednesday; monthly `BYMONTHDAY=31` skips 30-day months; `BYMONTHDAY=-1`; `BYDAY=-1FR`; yearly Feb 29 only in leap years; `INTERVAL=2` weekly with `WKST=SU` vs `MO`; `COUNT` with a non-matching `DTSTART` (RFC behavior); `UNTIL` exactly on an occurrence.
     - _Requirements: 6.3, 6.4; Design §5.4_
 
-  - [ ] 5.2 Write the property test comparing the expander with `dateutil`
+  - [x] 5.2 Write the property test comparing the expander with `dateutil`
     - **Property 9: Expander agrees with the reference**
     - **Validates: Requirements 6.3–6.5**
     - New file `tests/unit/test_ics_recurrence_oracle_property.py`; `hypothesis`, min 100 iterations. Generate supported rules (`BYMONTHDAY` limited to 1–28 and ±1), `DTSTART`s, and bounded horizons; compare against `dateutil.rrule` with the same explicit parts, adding `DTSTART` and reducing `COUNT` by one when `DTSTART` doesn't match the rule. Only this test file imports `dateutil`. Tag: `Feature: calendar-import, Property 9: Expander agrees with the reference`.
 
-  - [ ] 5.3 Start expansion at the import window for rules without `COUNT`
+  - [x] 5.3 Start expansion at the import window for rules without `COUNT`
     - Compute `p0` as the largest multiple of `INTERVAL` whose period starts at or before `lo`'s period (never below 0) when the rule has no `COUNT`; keep `p0 = 0` for `COUNT` rules.
     - **Property 10: Starting at the window changes nothing**
     - **Validates: Requirements 6.1–6.2; Design §5.4**
     - New file `tests/unit/test_ics_recurrence_window_property.py`; `hypothesis`, min 100 iterations. For supported rules without `COUNT` and `DTSTART`s up to ~5 years before `lo`, compare against the period-0 walk filtered to `[lo, hi]`. Also assert the number of periods examined stays within `(hi − lo)` ÷ period length + 2. Tag: `Feature: calendar-import, Property 10: Starting at the window changes nothing`.
 
-  - [ ] 5.4 Add the examined-date budget, `RDATE`, and `EXDATE`
+  - [x] 5.4 Add the examined-date budget, `RDATE`, and `EXDATE`
     - Add a file-wide budget object shared across calls: each examined period costs `1 + len(candidates)`, each `RDATE` costs 1, and going over 200,000 raises `InvalidCalendarError` with the Design §5.4 message.
     - Merge `RDATE` values, remove `EXDATE` values (exact wall-time match; a DATE `EXDATE` removes all originals on that date), de-duplicate, and sort.
     - Extend `tests/unit/test_ics_recurrence_edge_cases.py`: `FREQ=DAILY;BYMONTH=2;BYMONTHDAY=30` with `COUNT=5` from 1990 is stopped by the budget rather than scanning to year 9999 (assert on the budget count, not time); `MONTHLY;BYDAY=1MO;BYMONTHDAY=20` (never matches) likewise; a daily `COUNT` series from 1990 fits within the budget; `RDATE` and both `EXDATE` forms.
     - _Requirements: 2.6, 6.5; Design §5.4, §5.5_
 
-- [ ] 6. Implement time zones (`app/ics/windows_zones.py`, `app/ics/zones.py`)
-  - [ ] 6.1 Generate the CLDR 49 Windows → IANA table
+- [x] 6. Implement time zones (`app/ics/windows_zones.py`, `app/ics/zones.py`)
+  - [x] 6.1 Generate the CLDR 49 Windows → IANA table
     - Download `common/supplemental/windowsZones.xml` at tag `release-49` once, keep the `territory="001"` rows, lower-case the Windows names, and write `windows_zones.py` with `CLDR_RELEASE = "49"`, `CLDR_SOURCE`, `WINDOWS_ZONES_VERSION = "7e11800"`, `WINDOWS_TO_IANA` (142 entries), and the regeneration steps in the module docstring. The download is a one-off step; no runtime or test code fetches anything.
     - New test file `tests/unit/test_ics_windows_zones.py`: 142 entries; `CLDR_RELEASE == "49"`; all keys lower-case; `"eastern standard time" → "America/New_York"`; every target is in the `tzdata` zone list.
     - _Requirements: 3.3, 3.7, 3.8, 12.8; Design §4.4_
 
-  - [ ] 6.2 Implement `zones.py`
+  - [x] 6.2 Implement `zones.py`
     - Load the key list from the `tzdata` package's `zones` file and build zones with `ZoneInfo.from_file(...)`, cached per key, never using the OS database. Implement `resolve_upload_zone(name)` (exact key only), `resolve_tzid(value)` (trim whitespace and quotes → exact key → lower-cased Windows table → `None`), and `to_local(wall, source, upload)` with `fold=0` (Design §4.4).
     - New test file `tests/unit/test_ics_zones.py`: `America/Toronto` valid and `Eastern Standard Time` invalid as an upload zone; `"Eastern Standard Time"` (quoted) and `eastern STANDARD time` resolve to `America/New_York`; `UTC` resolves via the key list; `(UTC-05:00) Eastern Time (US & Canada)` and `/mozilla.org/20050126_1/America/New_York` resolve to `None`; the gap example (02:30 → 03:30 `America/New_York` on 2026-03-08) and the fold example (01:30 → 05:30Z on 2026-11-01); floating input is returned unchanged.
     - _Requirements: 2.2, 3.2–3.5, 3.9, 3.10, 4.1, 4.2, 4.4, 4.6, 4.8; Design §4.4_
 
-  - [ ] 6.3 Write property tests for DST resolution
+  - [x] 6.3 Write property tests for DST resolution
     - **Property 6: DST gap rule**
     - **Property 7: DST fold rule**
     - **Validates: Requirements 4.1, 4.2**
     - New file `tests/unit/test_ics_zones_dst_property.py`; `hypothesis`, min 100 iterations each. Draw zones from the `tzdata` keys, find gap and fold transitions by scanning each zone's UTC offsets over a year, and draw wall times inside them. Tags: `Feature: calendar-import, Property 6: DST gap rule` and `Feature: calendar-import, Property 7: DST fold rule`.
 
-- [ ] 7. Implement the content-line reader (`app/ics/content.py`)
-  - [ ] 7.1 Implement `read_calendar`
+- [x] 7. Implement the content-line reader (`app/ics/content.py`)
+  - [x] 7.1 Implement `read_calendar`
     - BOM strip and strict UTF-8 decode, empty check, CRLF/LF normalization, unfolding, line tokenizing (quoted and multi-value parameters, upper-cased names, `BadLine` tokens), and the component tree with `BEGIN`/`END` matching, top-level `VCALENDAR` only, multiple calendars, nesting limit 8, and `VEVENT` malformed marking. Return a `CalendarDocument` with the `VEVENT`s in file order; drop other components (Design §4.2).
     - New test file `tests/unit/test_ics_content.py`: one example per `InvalidCalendarError` message in Design §4.2 (invalid UTF-8, empty, continuation on first line, unmatched `END`, missing `END`, content outside `VCALENDAR`, no `VCALENDAR`, nesting depth 9); a BOM-prefixed file; LF-only and mixed line endings; a bad line inside a `VEVENT` marks only that event; a bad line inside `VTIMEZONE` is ignored; `VTODO`/`VALARM` are dropped.
     - _Requirements: 2.5, 2.10, 3.6, 8.8; Design §4.2_
 
-  - [ ] 7.2 Write property tests for the reader
+  - [x] 7.2 Write property tests for the reader
     - **Property 1: Content-line round trip**
     - **Property 15: Robustness** (reader half: `read_calendar` returns a document or raises `InvalidCalendarError`)
     - **Validates: Requirements 2.5, 2.10, 8.1**
@@ -168,6 +169,12 @@ Ground rules for every task:
     - **Property 18: Past events are skipped and counted once**
     - **Validates: Requirements 2.6, 4.8, 6.12–6.14, 8.7, 10.5, 10.8, 12.4, 12.7**
     - New file `tests/unit/test_ics_events_limits_property.py`; `hypothesis`, min 100 iterations each. For Property 14, use instrumented counters (records emitted, dates examined) to show expansion stops at 2,001 records or at the budget. Include the fixed example of 12 daily series over 180 days (2,160 records) being rejected. Tag each with its property line.
+
+    
+  - [ ] 8.7 Skip RDATE-without-RRULE events as unsupported_recurrence
+    - An event with RDATE but no RRULE is skipped as one `unsupported_recurrence` entry with a clear message, instead of importing as a single event with the extra dates ignored. The check runs after the existing checks, so cancelled, all_day, unknown_timezone and the others still take precedence. Overrides sharing its UID are dropped with it, as for a skipped recurring series.
+    - Update Requirement 6, Criterion 10 and Design §4.5 row 8 and the §5.2 table to match. Add one test to `tests/unit/test_ics_events_recurring.py`. Renumber nothing.
+    - _Requirements: 6.10; Design §4.5, §5.2_
 
 - [ ] 9. Implement matching (`app/ics/matching.py`)
   - [ ] 9.1 Implement `plan_import`
